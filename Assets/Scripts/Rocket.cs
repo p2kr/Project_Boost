@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class Rocket : MonoBehaviour
 {
@@ -8,6 +9,8 @@ public class Rocket : MonoBehaviour
     private Rigidbody rigidBody;
     private AudioSource audioSource;
 
+    enum State { Alive, Dying, Transcending }
+    State state = State.Alive;
 
     private void Start()
     {
@@ -18,24 +21,42 @@ public class Rocket : MonoBehaviour
     // Update is called once per frame
     private void Update()
     {
-        Thrust();
-        Rotate();
+        // todo somewhere stop sound on death
+        if (state == State.Alive)
+        {
+            Thrust();
+            Rotate();
+        }
     }
     private void OnCollisionEnter(Collision collision)
     {
+        if (state != State.Alive) { return; } // ignore collisons
         switch (collision.gameObject.tag)
         {
             case "Friendly":
                 print("ok");
                 break;
-            case "Fuel":
-                print("Fuel");
+            case "Finish":
+                state = State.Transcending;
+                Invoke("LoadNextScene", 1f); // parameterize time
                 break;
             default:
-                print("Dead");
+                print("Hit something deadly");
+                state = State.Dying;
+                Invoke("LoadFirstLevel", 1f);
                 // kill the player
                 break;
         }
+    }
+
+    private void LoadNextScene()
+    {
+        SceneManager.LoadScene(1); // todo allow for more than 2 levels
+    }
+
+    private void LoadFirstLevel()
+    {
+        SceneManager.LoadScene(0);
     }
     private void Rotate()
     {
