@@ -2,8 +2,12 @@
 
 public class Rocket : MonoBehaviour
 {
+    [SerializeField] private float rcsThrust = 100f;
+    [SerializeField] float mainThrust = 100f;
+
     private Rigidbody rigidBody;
-    private new AudioSource audioSource;
+    private AudioSource audioSource;
+
 
     private void Start()
     {
@@ -14,14 +18,30 @@ public class Rocket : MonoBehaviour
     // Update is called once per frame
     private void Update()
     {
-        ProcessInput();
+        Thrust();
+        Rotate();
     }
 
-    private void ProcessInput()
+    private void Rotate()
+    {
+        float rotationThisFrame = rcsThrust * Time.deltaTime;
+        rigidBody.freezeRotation = true;// take manual control of rotation
+        if (Input.GetKey(KeyCode.A))
+        {
+            transform.Rotate(Vector3.forward * rotationThisFrame);
+        }
+        else if (Input.GetKey(KeyCode.D))
+        {
+            transform.Rotate(-Vector3.forward * rotationThisFrame);
+        }
+        rigidBody.freezeRotation = false; // resume physics rotation
+    }
+
+    private void Thrust()
     {
         if (Input.GetKey(KeyCode.Space)) // can thrust while rotating
         {
-            rigidBody.AddRelativeForce(Vector3.up);
+            rigidBody.AddRelativeForce(Vector3.up * mainThrust * Time.deltaTime);
             if (!audioSource.isPlaying) // so it doesn't layer
             {
                 audioSource.Play();
@@ -30,15 +50,6 @@ public class Rocket : MonoBehaviour
         else
         {
             audioSource.Stop();
-        }
-
-        if (Input.GetKey(KeyCode.A))
-        {
-            transform.Rotate(Vector3.forward);
-        }
-        else if (Input.GetKey(KeyCode.D))
-        {
-            transform.Rotate(-Vector3.forward);
         }
     }
 }
