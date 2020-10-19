@@ -1,20 +1,18 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class Rocket : MonoBehaviour
 {
+    private Rigidbody rigidBody;
+    private new AudioSource audioSource;
 
-    Rigidbody rigidBody;
-
-    void Start()
+    private void Start()
     {
         rigidBody = GetComponent<Rigidbody>();
+        audioSource = GetComponent<AudioSource>();
     }
 
     // Update is called once per frame
-    void Update()
+    private void Update()
     {
         ProcessInput();
     }
@@ -24,7 +22,16 @@ public class Rocket : MonoBehaviour
         if (Input.GetKey(KeyCode.Space)) // can thrust while rotating
         {
             rigidBody.AddRelativeForce(Vector3.up);
+            if (!audioSource.isPlaying) // so it doesn't layer
+            {
+                audioSource.Play();
+            }
         }
+        else
+        {
+            audioSource.Stop();
+        }
+
         if (Input.GetKey(KeyCode.A))
         {
             transform.Rotate(Vector3.forward);
