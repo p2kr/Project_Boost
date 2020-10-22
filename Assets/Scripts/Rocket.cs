@@ -9,6 +9,7 @@ public class Rocket : MonoBehaviour
     [SerializeField] private AudioClip deathSound;
     [SerializeField] private AudioClip successSound;
 
+    //cache reference
     private Rigidbody rigidBody;
     private AudioSource audioSource;
 
